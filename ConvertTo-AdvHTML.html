@@ -1,0 +1,232 @@
+<p><strong>Synopsis</strong><br/>
+    Advanced replacement of ConvertTo-HTML cmdlet.</p>
+
+<p><strong>Syntax</strong><br/>
+    ConvertTo-AdvHTML [-InputObject] &lt;Object[]&gt; [[-HeadWidth] &lt;String[]&gt;] [[-CSS] &lt;String&gt;] [[-Title] &lt;String&gt;] [[-PreContent] &lt;String&gt;] [[-PostContent] &lt;String&gt;] [[-Body] &lt;String&gt;] [-Fragment ] [&lt;CommonParameters&gt;]</p>
+
+
+<p><strong>Description</strong><br/>
+    This function allows for vastly greater control over cells and rows
+    in a HTML table.  It takes ConvertTo-HTML to a whole new level!  You
+    can now specify what color a cell or row is (either dirctly or through 
+    the use of CSS).  You can add links, pictures and pictures AS links.
+    You can also specify a cell to be a bar graph where you control the 
+    colors of the graph and text that can be included in the graph.</p>
+    
+    <p>All color functions are through the use of imbedded text tags inside the
+    properties of the object you pass to this function.  It is important to note 
+    that this function does not do any processing for you, you must make sure all 
+    control tags are already present in the object before passing it to the 
+    function.</p>
+    
+    <p>Here are the different tags available:</p>
+    
+<table border="2px" style="border-collapse:collapse">
+<tr><th style="background-color:#6495ED">Syntax</th><th style="width:65%;background-color:#6495ED">Comment</th></tr>
+<tr><td>[cell:&lt;color&gt;]&lt;optional text&gt;</td><td><p>Designate the color of the cell.  Must be                        at the beginning of the string.<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Example:&nbsp;&nbsp;&nbsp;[cell:red]System Down</p></td></tr>
+<tr><td>[row:&lt;color&gt;]</td><td><p>Designate the color of the row.  This control can be anywhere, in any property of the object.<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Example:&nbsp;&nbsp;&nbsp;[row:orchid</p></td></tr>
+<tr><td>[cellclass:&lt;class&gt;]&lt;optional text&gt;</td><td><p>Designate the color, and other properties, of the
+cell based on a class in your CSS.  You must have the class in your CSS (use the -CSS parameter).  Must be at the beginning of the string.<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Example:&nbsp;&nbsp;&nbsp;[cellclass:highlight]10mb</p></td></tr>
+<tr><td>[rowclass:&lt;class&gt;]</td><td>Designate the color, and other properties, of the row based on a class in your CSS.  You must have the class in your CSS (use the -CSS parameter).  This control can be anywhere, in any property of the object.<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Example:&nbsp;&nbsp;&nbsp;[rowclass:greyishbold]</td></tr>
+<tr><td>[image:&lt;height;width;url&gt;]&lt;alternate text&gt;</td><td>Include an image in your cell.  Put size of picture in pixels and url seperated by semi-colons.  Format must be height;width;url.  You can also include other text in the cell, but the [image] tag must be at the end of the tag (so the alternate text is last).<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Example:&nbsp;&nbsp;&nbsp;[image:100;200;http://www.sampleurl.com/sampleimage.jpg]Alt Text For Image</td></tr>
+<tr><td>[link:&lt;url&gt;]&lt;link text&gt;</td><td>Include a link in your cell.  Other text is allowed in the string, but the [link] tag must be at the end of the string.<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Example:&nbsp;&nbsp;&nbsp;blah blah blah [link:www.thesurlyadmin.com]Cool PowerShell Link</td></tr>
+<tr><td>[linkpic:&lt;height;width;url to pic&gt;]&lt;url for link&gt;</td><td>This tag uses a picture which you can click on and go to the specified link.  You must specify the size of the picture and url where it is located, this information is seperated by semi-colons.  Other text is allowed in the string, but the [link] tag must be at the end of the string.<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Example:&nbsp;&nbsp;&nbsp;[linkpic:100;200;http://www.sampleurl.com/sampleimage.jpg]www.thesurlyadmin.com</td></tr>
+<tr><td>[bar:&lt;percent;bar color;remainder color&gt;]&lt;optional text&gt;</td><td><p>Bar graph makes a simple colored bar graph within the cell.  The length of the bar is controlled using &lt;percent&gt;.  You can designate the color of the bar, and the color of the remainder section.  Due to the mysteries of HTML, you must designate a width for the column with the [bar] tag using the HeadWidth parameter.</p><p>So if you had a percentage of 95, say 95% used disk you would want to highlight the remainder for your report:<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Example:&nbsp;&nbsp;&nbsp;[bar:95;dark green;red]5% free</p><p>What if you were at 30% of a sales goal with only 2 weeks left in the quarter, you would want to highlight that you have a problem.<br/><br/>&nbsp;&nbsp;&nbsp;&nbsp;Example:&nbsp;&nbsp;&nbsp;[bar:30;darkred;red]30% of goal</p></td></tr>
+</table>
+<p>
+<strong>Parameters</strong></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;-InputObject &lt;Object[]&gt;<br/>
+<table>
+<tr><td style="width:25px">&nbsp;</td><td>The object you want converted to an HTML table</td></tr>
+</table>
+
+<table>
+<tr><th style="width:25px">&nbsp;</th><th style="width:200px">&nbsp;</th><th>&nbsp;</th></tr>
+<tr><td>&nbsp;</td><td>Required?</td><td>true</td></tr>
+<tr><td>&nbsp;</td><td>Postiion</td><td>1</td></tr>
+<tr><td>&nbsp;</td><td>Default value</td><td></td></tr>
+<tr><td>&nbsp;</td><td>Accept pipeline input?</td><td>true (ByValue)</td></tr>
+<tr><td>&nbsp;</td><td>Accept wildcard characters?</td><td>false</td></tr>
+</table></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;-HeadWidth &lt;String[]&gt;<br/>
+<table>
+<tr><td style="width:25px">&nbsp;</td><td>You can specify the width of a cell.  Cell widths are in pixels and are passed to the parameter in array format.  Each element in the array corresponds to the column in your table, any element that is set to 0 will designate the column with be dynamic.  If you had four elements in your InputObject and wanted to make the 4th a fixed width--this is required for using the [bar] tag--of 600 pixels:<br/><br/>-HeadWidth 0,0,0,600</td></tr>
+</table>
+
+<table>
+<tr><th style="width:25px">&nbsp;</th><th style="width:200px">&nbsp;</th><th>&nbsp;</th></tr>
+<tr><td>&nbsp;</td><td>Required?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Postiion</td><td>2</td></tr>
+<tr><td>&nbsp;</td><td>Default value</td><td></td></tr>
+<tr><td>&nbsp;</td><td>Accept pipeline input?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Accept wildcard characters?</td><td>false</td></tr>
+</table></p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;-CSS &lt;String&gt;<br/>
+<table>
+<tr><td style="width:25px">&nbsp;</td><td>Designate custom CSS for your HTML</td></tr>
+</table>
+
+<table>
+<tr><th style="width:25px">&nbsp;</th><th style="width:200px">&nbsp;</th><th>&nbsp;</th></tr>
+<tr><td>&nbsp;</td><td>Required?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Postiion</td><td>3</td></tr>
+<tr><td>&nbsp;</td><td>Default value</td><td>&lt;style&gt;<br/>
+        TABLE {border-width: 1px;border-style: solid;border-color: black;border-collapse: collapse;}<br/>
+        TH {border-width: 1px;padding: 3px;border-style: solid;border-color: black;background-color: #6495ED;font-size:120%;}<br/>
+        TD {border-width: 1px;padding: 3px;border-style: solid;border-color: black;}</br>
+        &lt;/style&gt;</td></tr>
+<tr><td>&nbsp;</td><td>Accept pipeline input?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Accept wildcard characters?</td><td>false</td></tr>
+</table></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;-Title &lt;String&gt;<br/>
+<table>
+<tr><td style="width:25px">&nbsp;</td><td>Specifies a title for the HTML file, that is, the text that appears between the &lt;TITLE&gt; tags.</td></tr>
+</table>
+
+<table>
+<tr><th style="width:25px">&nbsp;</th><th style="width:200px">&nbsp;</th><th>&nbsp;</th></tr>
+<tr><td>&nbsp;</td><td>Required?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Postiion</td><td>4</td></tr>
+<tr><td>&nbsp;</td><td>Default value</td><td></td></tr>
+<tr><td>&nbsp;</td><td>Accept pipeline input?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Accept wildcard characters?</td><td>false</td></tr>
+</table></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;-PreContent &lt;String&gt;<br/>
+<table>
+<tr><td style="width:25px">&nbsp;</td><td>Specifies text to add before the opening &lt;TABLE&gt; tag. By default, there is no text in that position.</td></tr>
+</table>
+
+<table>
+<tr><th style="width:25px">&nbsp;</th><th style="width:200px">&nbsp;</th><th>&nbsp;</th></tr>
+<tr><td>&nbsp;</td><td>Required?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Postiion</td><td>5</td></tr>
+<tr><td>&nbsp;</td><td>Default value</td><td></td></tr>
+<tr><td>&nbsp;</td><td>Accept pipeline input?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Accept wildcard characters?</td><td>false</td></tr>
+</table></p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;-PostContent &lt;String&gt;<br/>
+<table>
+<tr><td style="width:25px">&nbsp;</td><td>Specifies text to add after the closing &lt;/TABLE&gt; tag. By default, there is no text in that position.</td></tr>
+</table>
+
+<table>
+<tr><th style="width:25px">&nbsp;</th><th style="width:200px">&nbsp;</th><th>&nbsp;</th></tr>
+<tr><td>&nbsp;</td><td>Required?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Postiion</td><td>6</td></tr>
+<tr><td>&nbsp;</td><td>Default value</td><td></td></tr>
+<tr><td>&nbsp;</td><td>Accept pipeline input?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Accept wildcard characters?</td><td>false</td></tr>
+</table></p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;-Body &lt;String&gt;<br/>
+<table>
+<tr><td style="width:25px">&nbsp;</td><td>Specifies the text to add after the opening &lt;BODY&gt; tag. By default, there is no text in that position.</td></tr>
+</table>
+
+<table>
+<tr><th style="width:25px">&nbsp;</th><th style="width:200px">&nbsp;</th><th>&nbsp;</th></tr>
+<tr><td>&nbsp;</td><td>Required?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Postiion</td><td>7</td></tr>
+<tr><td>&nbsp;</td><td>Default value</td><td></td></tr>
+<tr><td>&nbsp;</td><td>Accept pipeline input?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Accept wildcard characters?</td><td>false</td></tr>
+</table></p>
+
+<p>&nbsp;&nbsp;&nbsp;&nbsp;-Fragment &lt;SwitchParameter&gt;<br/>
+<table>
+<tr><td style="width:25px">&nbsp;</td><td>Generates only an HTML table. The HTML, HEAD, TITLE, and BODY tags are omitted.</td></tr>
+</table>
+
+<table>
+<tr><th style="width:25px">&nbsp;</th><th style="width:200px">&nbsp;</th><th>&nbsp;</th></tr>
+<tr><td>&nbsp;</td><td>Required?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Postiion</td><td>named</td></tr>
+<tr><td>&nbsp;</td><td>Default value</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Accept pipeline input?</td><td>false</td></tr>
+<tr><td>&nbsp;</td><td>Accept wildcard characters?</td><td>false</td></tr>
+</table></p>
+
+<p><strong>Inputs</strong><br/>
+System.Management.Automation.PSObject<br/>
+You can pipe any .NET object to ConvertTo-AdvHtml.</p>
+
+<p><strong>Outputs</strong><br/>
+System.String<br/>
+ConvertTo-AdvHtml returns series of strings that comprise valid HTML.</p>
+
+<p><strong>Examples</strong><br/>
+<p>The following code is an example of an array of objects with the ConvertTo-AdvHTML control tags built into the property values. </p>
+<pre><span style="color: #800080;">$Data</span><span style="color: #000000;"> </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> @(
+    [</span><span style="color: #008080;">PSCustomObject</span><span style="color: #000000;">]@{
+        Server </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[row:orchid]Server1</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Description </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">Hello1</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Status </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[cellclass:up]Up</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Disk </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[bar:45;Purple;Orchid]55% Free</span><span style="color: #800000;">"</span><span style="color: #000000;">
+    },
+    [</span><span style="color: #008080;">PSCustomObject</span><span style="color: #000000;">]@{
+        Server </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">Server2</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Description </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">Hello2</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Status </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[cell:green]Up</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Disk </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[bar:65;DarkGreen;Green]65% Used</span><span style="color: #800000;">"</span><span style="color: #000000;">
+    },
+    [</span><span style="color: #008080;">PSCustomObject</span><span style="color: #000000;">]@{
+        Server </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">Server3</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Description </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">Goodbye3</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Status </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[cell:red]Down</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Disk </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[bar:95;DarkGreen;DarkRed]5% Free</span><span style="color: #800000;">"</span><span style="color: #000000;">
+    },
+    [</span><span style="color: #008080;">PSCustomObject</span><span style="color: #000000;">]@{
+        Server </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">Server4</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Description </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">This is quite a cool test</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Status </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[cell:green]Up</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Disk </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[image:150;650;http://pughspace.files.wordpress.com/2014/01/test-connection.png]Test Images</span><span style="color: #800000;">"</span><span style="color: #000000;">
+    },
+    [</span><span style="color: #008080;">PSCustomObject</span><span style="color: #000000;">]@{
+        Server </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">Server5</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Description </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">SurlyAdmin</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Status </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[cell:red]Down</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Disk </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[link:http://thesurlyadmin.com]The Surly Admin</span><span style="color: #800000;">"</span><span style="color: #000000;">
+    },
+    [</span><span style="color: #008080;">PSCustomObject</span><span style="color: #000000;">]@{
+        Server </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">Server6</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Description </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">MoreSurlyAdmin</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Status </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[cell:purple]Updating</span><span style="color: #800000;">"</span><span style="color: #000000;">
+        Disk </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800000;">"</span><span style="color: #800000;">[linkpic:150;650;http://pughspace.files.wordpress.com/2014/01/test-connection.png]http://thesurlyadmin.com</span><span style="color: #800000;">"</span><span style="color: #000000;">
+    }
+)
+
+</span><span style="color: #800080;">$HTML</span><span style="color: #000000;"> </span><span style="color: #FF0000;">=</span><span style="color: #000000;"> </span><span style="color: #800080;">$Data</span><span style="color: #000000;"> | </span><span style="color: #5F9EA0;">ConvertTo-AdvHTML</span><span style="color: #000000;"> -HeadWidth </span><span style="color: #000000;">0</span><span style="color: #000000;">,</span><span style="color: #000000;">0</span><span style="color: #000000;">,</span><span style="color: #000000;">0</span><span style="color: #000000;">,</span><span style="color: #000000;">600</span><span style="color: #000000;"> -PreContent </span><span style="color: #800000;">"</span><span style="color: #800000;">&lt;p&gt;&lt;h1&gt;Sample ConvertTo-AdvHTML Report&lt;/h1&gt;&lt;/p&gt;&lt;br&gt;</span><span style="color: #800000;">"</span><span style="color: #000000;"> -PostContent </span><span style="color: #800000;">"</span><span style="color: #800000;">&lt;br&gt;Done! $(Get-Date)</span><span style="color: #800000;">"</span><span style="color: #000000;"> -Title </span><span style="color: #800000;">"</span><span style="color: #800000;">Cool Test!</span><span style="color: #800000;">"</span></pre>
+<p>Produces the following table:</p>
+<hr>
+<p><h1>Sample ConvertTo-AdvHTML Report</h1></p><br>
+<table border="2" style="border-collapse:collapse">
+<colgroup><col/><col/><col/><col/></colgroup>
+<tr><th style="background-color:#6495ED">Server</th><th style="background-color:#6495ED">Description</th><th style="background-color:#6495ED">Status</th><th style="background-color:#6495ED;width:600px">Disk</th></tr>
+<tr style="background-color:orchid"><td>Server1</td><td>Hello1</td><td class="up">Up</td><td><div style="background-color:Purple;float:left;width:45%">55% Free</div><div style="background-color:Orchid;float:left;width:55%">&nbsp;</div></td></tr>
+<tr><td>Server2</td><td>Hello2</td><td style="background-color:green">Up</td><td><div style="background-color:DarkGreen;float:left;width:65%">65% Used</div><div style="background-color:Green;float:left;width:35%">&nbsp;</div></td></tr>
+<tr><td>Server3</td><td>Goodbye3</td><td style="background-color:red">Down</td><td><div style="background-color:DarkGreen;float:left;width:95%">5% Free</div><div style="background-color:DarkRed;float:left;width:5%">&nbsp;</div></td></tr>
+<tr><td>server4</td><td>This is quite a cool test</td><td style="background-color:green">Up</td><td><img src="http://pughspace.files.wordpress.com/2014/01/test-connection.png" alt="Test Images" height="150" width="650"></td></tr>
+<tr><td>server5</td><td>SurlyAdmin</td><td style="background-color:red">Down</td><td><a href="http://thesurlyadmin.com">The Surly Admin</a></td></tr>
+<tr><td>server6</td><td>MoreSurlyAdmin</td><td style="background-color:purple">Updating</td><td><a href="http://thesurlyadmin.com"><img src="http://pughspace.files.wordpress.com/2014/01/test-connection.png" height="150" width="650"></a></td></tr>
+</table>
+<br></strong>Done!&nbsp;02/23/2014 17:41:09<br/><br/></p>
+<hr>
+
+<p><strong>Notes</strong>
+<table>
+<th style="width:25px">&nbsp;</th><th style="width:150px">&nbsp;</th><th>&nbsp;</th>
+<tr><td></td><td>Author:</td><td>Martin Pugh</td></tr>
+<tr><td></td><td>Twitter:</td><td><a href="https://twitter.com/thesurlyadm1n">@thesurlyadm1n</a></td></tr>
+<tr><td></td><td>Spiceworks:</td><td><a href="http://community.spiceworks.com/people/martin9700">Martin9700</a></td></tr>
+<tr><td></td><td>Blog:</td><td><a href="www.thesurlyadmin.com">www.thesurlyadmin.com</a></td></tr>
+</table></p><p><br/></p>
+
+<strong>Changelog:</strong>
+<table>
+<th style="width:25px">&nbsp;</th><th style="width:150px">&nbsp;</th><th>&nbsp;</th>
+<tr><td></td><td>1.0</td><td>Initial Release</td></tr>
+</table>
+
+
